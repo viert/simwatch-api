@@ -49,6 +49,11 @@ class CamdenStub(object):
                 request_serializer=camden__pb2.NoParams.SerializeToString,
                 response_deserializer=camden__pb2.MetricSetTextResponse.FromString,
                 )
+        self.SubscribeQuery = channel.stream_stream(
+                '/camden.Camden/SubscribeQuery',
+                request_serializer=camden__pb2.QuerySubscriptionRequest.SerializeToString,
+                response_deserializer=camden__pb2.QuerySubscriptionUpdate.FromString,
+                )
 
 
 class CamdenServicer(object):
@@ -96,6 +101,12 @@ class CamdenServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def SubscribeQuery(self, request_iterator, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_CamdenServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -133,6 +144,11 @@ def add_CamdenServicer_to_server(servicer, server):
                     servicer.GetMetricsText,
                     request_deserializer=camden__pb2.NoParams.FromString,
                     response_serializer=camden__pb2.MetricSetTextResponse.SerializeToString,
+            ),
+            'SubscribeQuery': grpc.stream_stream_rpc_method_handler(
+                    servicer.SubscribeQuery,
+                    request_deserializer=camden__pb2.QuerySubscriptionRequest.FromString,
+                    response_serializer=camden__pb2.QuerySubscriptionUpdate.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -260,5 +276,22 @@ class Camden(object):
         return grpc.experimental.unary_unary(request, target, '/camden.Camden/GetMetricsText',
             camden__pb2.NoParams.SerializeToString,
             camden__pb2.MetricSetTextResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def SubscribeQuery(request_iterator,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.stream_stream(request_iterator, target, '/camden.Camden/SubscribeQuery',
+            camden__pb2.QuerySubscriptionRequest.SerializeToString,
+            camden__pb2.QuerySubscriptionUpdate.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
