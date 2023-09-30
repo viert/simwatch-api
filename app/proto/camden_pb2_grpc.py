@@ -29,6 +29,11 @@ class CamdenStub(object):
                 request_serializer=camden__pb2.PilotRequest.SerializeToString,
                 response_deserializer=camden__pb2.PilotResponse.FromString,
                 )
+        self.ListPilots = channel.unary_unary(
+                '/camden.Camden/ListPilots',
+                request_serializer=camden__pb2.QueryRequest.SerializeToString,
+                response_deserializer=camden__pb2.PilotListResponse.FromString,
+                )
         self.CheckQuery = channel.unary_unary(
                 '/camden.Camden/CheckQuery',
                 request_serializer=camden__pb2.QueryRequest.SerializeToString,
@@ -72,6 +77,12 @@ class CamdenServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def GetPilot(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ListPilots(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -124,6 +135,11 @@ def add_CamdenServicer_to_server(servicer, server):
                     servicer.GetPilot,
                     request_deserializer=camden__pb2.PilotRequest.FromString,
                     response_serializer=camden__pb2.PilotResponse.SerializeToString,
+            ),
+            'ListPilots': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListPilots,
+                    request_deserializer=camden__pb2.QueryRequest.FromString,
+                    response_serializer=camden__pb2.PilotListResponse.SerializeToString,
             ),
             'CheckQuery': grpc.unary_unary_rpc_method_handler(
                     servicer.CheckQuery,
@@ -208,6 +224,23 @@ class Camden(object):
         return grpc.experimental.unary_unary(request, target, '/camden.Camden/GetPilot',
             camden__pb2.PilotRequest.SerializeToString,
             camden__pb2.PilotResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ListPilots(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/camden.Camden/ListPilots',
+            camden__pb2.QueryRequest.SerializeToString,
+            camden__pb2.PilotListResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

@@ -1,3 +1,3 @@
-croydon==0.21.16
+croydon==0.22.1
 grpcio
 protobuf
