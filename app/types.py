@@ -50,6 +50,24 @@ class MapWeatherRequest(MapBaseRequest):
         )
 
 
+class MapSubscribeIDRequest(MapBaseRequest):
+    subscribe_id: str
+
+    def to_grpc(self) -> MapUpdatesRequest:
+        return MapUpdatesRequest(
+            subscribe_id=self.subscribe_id
+        )
+
+
+class MapUnsubscribeIDRequest(MapBaseRequest):
+    unsubscribe_id: str
+
+    def to_grpc(self) -> MapUpdatesRequest:
+        return MapUpdatesRequest(
+            unsubscribe_id=self.unsubscribe_id
+        )
+
+
 class Runway(BaseModel):
     icao: str
     length_ft: Optional[int] = None
@@ -129,12 +147,12 @@ class FlightPlan(BaseModel):
 
 
 class TrackPoint(BaseModel):
-    lat: float
-    lng: float
-    alt: int
-    hdg: int
-    gs: int
-    ts: int
+    lat: float = 0.0
+    lng: float = 0.0
+    alt: int = 0
+    hdg: int = 0
+    gs: int = 0
+    ts: int = 0
 
 
 class Pilot(BaseModel):
