@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import Optional, Dict, List
 from app.proto.camden_pb2 import MapUpdatesRequest, MapBounds, Point as GRPCPoint
 
@@ -155,6 +155,17 @@ class TrackPoint(BaseModel):
     ts: int = 0
 
 
+class Aircraft(BaseModel):
+    aircraft_type: str
+    description: str
+    engine_count: int
+    engine_type: str
+    manufacturer_code: str
+    name: str
+    wtc: str
+    wtg: str
+
+
 class Pilot(BaseModel):
     cid: int
     name: Optional[str] = None
@@ -172,6 +183,7 @@ class Pilot(BaseModel):
     last_updated: Optional[int] = None
     logon_time: Optional[int] = None
     track: List[TrackPoint]
+    aircraft_type: Optional[Aircraft]
 
 
 class QueryResponse(BaseModel):
