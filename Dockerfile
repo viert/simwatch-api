@@ -10,5 +10,5 @@ ADD requirements.txt /opt/requirements.txt
 WORKDIR /opt
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
-ENV CROYDON_CONFIG=/etc/simwatch/application.toml
+ENV CROYDON_CONFIG=/etc/simwatch/simwatch-api.toml
 CMD ["python3.11", "crcmd.py", "run", "-H", "0.0.0.0"]
