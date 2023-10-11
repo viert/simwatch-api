@@ -23,3 +23,6 @@ cleanup_interval = "01:00:00" # 1 hour
 
 [grpc]
 socket = "localhost:12000"
+
+[bot]
+token = ""

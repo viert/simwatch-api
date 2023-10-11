@@ -1,3 +1,4 @@
 croydon==0.22.1
 grpcio
 protobuf
+aiohttp
