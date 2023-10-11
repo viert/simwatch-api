@@ -38,6 +38,8 @@ class TelegramBot:
 
     async def check(self) -> bool:
         response = await self.api_request_raw("GET", "/getMe")
+        data = await response.json()
+        ctx.log.debug(f"/getMe response {data}")
         return response.status == 200
 
     async def api_request_raw(self,
