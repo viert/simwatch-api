@@ -90,6 +90,7 @@ class TelegramBot:
         if chat_data and chat_data.type == "private":
             chat = await Chat.get(f"{chat_data.id}")
             if chat is None:
+                ctx.log.debug(f"creating a new chat {chat_data.id}")
                 chat = Chat.create(
                     chat_id=f"{chat_data.id}",
                     first_name=chat_data.first_name,
@@ -171,6 +172,8 @@ class TelegramBot:
         await self.send_text(chat.chat_id, f"You have successfully unsubscribed from query `{sub.query}`")
 
     async def process_updates(self, updates: List[Dict[str, Any]]) -> int:
+        ctx.log.debug(f"processing {len(updates)} updates")
+
         update_id = 0
         for update in updates:
             new_update_id = update.get("update_id")
@@ -179,26 +182,33 @@ class TelegramBot:
 
             message = update.get("message")
             if not message:
+                ctx.log.debug("no message found in the update, skipping")
                 continue
+
             message = Message(**message)
             chat = await self.setup_chat(message)
             if chat:
                 await self.process_command(message, chat)
+
         return update_id + 1
 
     async def _poll_updates(self):
+        ctx.log.debug("updates poller started")
         update_id = 0
         timeout = aiohttp.ClientTimeout(total=self.poll_timeout)
-        async with aiohttp.ClientSession() as session:
-            while True:
+        while True:
+            url = f"{BASE_URI}{self.token}/getUpdates?offset={update_id}&timeout={self.poll_timeout}"
+            async with aiohttp.ClientSession() as session:
                 try:
-                    url = f"{BASE_URI}{self.token}/getUpdates?offset={update_id}&timeout={self.poll_timeout}"
-                    async with session.get(url, timeout=timeout) as response:
-                        data = await response.json()
-                        if data["result"]:
-                            update_id = await self.process_updates(data["result"])
+                    ctx.log.debug(f"polling for updates starting from {update_id} using timeout {self.poll_timeout}")
+                    response = await session.get(url, timeout=timeout)
+                    data = await response.json()
+                    if data["result"]:
+                        update_id = await self.process_updates(data["result"])
                 except asyncio.TimeoutError:
                     continue
+                except Exception as e:
+                    ctx.log.error(f"error polling updates: {e}")
 
     async def _read_queue(self) -> Dict[str, str]:
         ctx.log.debug("waiting for an item from queue")
