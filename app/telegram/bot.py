@@ -1,5 +1,4 @@
 import asyncio
-
 import aiohttp
 
 from typing import List, Dict, Any, Optional
@@ -48,8 +47,10 @@ class TelegramBot:
                               data: Optional[Dict[str, Any]] = None) -> aiohttp.ClientResponse:
         async with aiohttp.ClientSession() as session:
             url = f"{BASE_URI}{self.token}{path}"
-            async with session.request(method, url, json=data) as response:
-                return response
+            kwds = {}
+            if data is not None:
+                kwds["json"] = data
+            return await session.request(method, url, **kwds)
 
     async def api_request(self,
                           method: str,
