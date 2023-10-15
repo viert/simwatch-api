@@ -78,11 +78,22 @@ class TelegramBot:
 
         cmd_text = cmd.text[1:]
         cmd_method = f"cmd_{cmd_text}"
+        name = ""
+        if chat.first_name:
+            name += chat.first_name
+        if chat.last_name:
+            if name:
+                name += " "
+            name += chat.last_name
+        if chat.username:
+            if name:
+                name += " "
+            name += f"@{chat.username}"
         if hasattr(self, cmd_method):
-            ctx.log.debug(f"processing \"{cmd_text}\" command from chat {chat.chat_id} with @{chat.username}")
+            ctx.log.debug(f"processing \"{cmd_text}\" command from chat {chat.chat_id} with {name}")
             await getattr(self, cmd_method)(message, chat)
         else:
-            ctx.log.debug(f"unrecognised command \"{cmd_text}\" from chat {chat.chat_id} with @{chat.username}")
+            ctx.log.debug(f"unrecognised command \"{cmd_text}\" from chat {chat.chat_id} with {name}")
 
     @staticmethod
     async def setup_chat(message: Message) -> Optional[Chat]:

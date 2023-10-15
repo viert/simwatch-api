@@ -5,17 +5,17 @@ from typing import List, Optional
 class FromField(BaseModel):
     id: int
     is_bot: bool
-    first_name: str
-    last_name: str
-    username: str
-    language_code: str
+    first_name: Optional[str]
+    last_name: Optional[str]
+    username: Optional[str]
+    language_code: Optional[str]
 
 
 class ChatField(BaseModel):
     id: int
-    first_name: str
-    last_name: str
-    username: str
+    first_name: Optional[str]
+    last_name: Optional[str]
+    username: Optional[str]
     type: str
 
 
