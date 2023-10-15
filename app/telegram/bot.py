@@ -209,19 +209,24 @@ class TelegramBot:
         ctx.log.debug("updates poller started")
         update_id = 0
         timeout = aiohttp.ClientTimeout(total=self.poll_timeout)
+        new_poll = True
         while True:
             url = f"{BASE_URI}{self.token}/getUpdates?offset={update_id}&timeout={self.poll_timeout}"
             async with aiohttp.ClientSession() as session:
                 try:
-                    ctx.log.debug(f"polling for updates starting from {update_id} using timeout {self.poll_timeout}")
+                    if new_poll:
+                        ctx.log.debug(f"polling for updates starting from {update_id} using timeout {self.poll_timeout}")
+                        new_poll = False
                     response = await session.get(url, timeout=timeout)
                     data = await response.json()
                     if data["result"]:
                         update_id = await self.process_updates(data["result"])
+                        new_poll = True
                 except asyncio.TimeoutError:
                     continue
                 except Exception as e:
                     ctx.log.error(f"error polling updates: {e}")
+                    new_poll = True
 
     async def _read_queue(self) -> Dict[str, str]:
         ctx.log.debug("waiting for an item from queue")
