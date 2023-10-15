@@ -96,6 +96,14 @@ class TelegramBot:
             ctx.log.debug(f"unrecognised command \"{cmd_text}\" from chat {chat.chat_id} with {name}")
 
     @staticmethod
+    async def get_chat(message: Message) -> Optional[Chat]:
+        chat_data = message.chat
+        if chat_data and chat_data.type == "private":
+            chat = await Chat.get(f"{chat_data.id}")
+            return chat
+        return None
+
+    @staticmethod
     async def setup_chat(message: Message) -> Optional[Chat]:
         chat_data = message.chat
         if chat_data and chat_data.type == "private":
@@ -112,8 +120,22 @@ class TelegramBot:
             return chat
         return None
 
-    async def cmd_start(self, _: Message, chat: Chat):
+    async def cmd_start(self, message: Message, chat: Optional[Chat] = None):
+        if chat is not None:
+            return
+        chat = await self.setup_chat(message)
+        if chat is None:
+            return
         await self.send_text(chat.chat_id, "Hello, this is *SimWatch*, how can I help?")
+
+    async def cmd_stop(self, _: Message, chat: Chat):
+        await chat.destroy()
+        await self.send_text(chat.chat_id, "Sorry to see you leaving. "
+                                           "I ensure you I have already forgotten your name and your subscriptions. "
+                                           "Maybe I've got something in logs, I don't know, to be honest. "
+                                           "I can't read them, I only write them. But I was told they are "
+                                           "rotated every now and then. What I'm saying is, feel free to come back, "
+                                           "if you need me, just type /start and we'll start from scratch")
 
     async def cmd_ping(self, _: Message, chat: Chat):
         await self.send_text(chat.chat_id, "pong")
@@ -199,9 +221,15 @@ class TelegramBot:
             message = Message(**message)
             ctx.log.debug(f"Received message: {message}")
 
-            chat = await self.setup_chat(message)
+            chat = await self.get_chat(message)
             if chat:
                 await self.process_command(message, chat)
+            else:
+                cmd = message.command()
+                if cmd:
+                    cmd_text = cmd.text[1:]
+                    if cmd_text == "start":
+                        self.cmd_start(message)
 
         return update_id + 1
 
