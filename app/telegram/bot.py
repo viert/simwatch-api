@@ -197,6 +197,8 @@ class TelegramBot:
                 continue
 
             message = Message(**message)
+            ctx.log.debug(f"Received message: {message}")
+
             chat = await self.setup_chat(message)
             if chat:
                 await self.process_command(message, chat)
